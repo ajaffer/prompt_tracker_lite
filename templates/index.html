@@ -1,36 +1,150 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Prompt Tracker Lite</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        textarea { width: 100%; height: 100px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 10px; border: 1px solid #ddd; }
+        body {
+          font-family: 'Segoe UI', sans-serif;
+          background-color: #f9f9f9;
+          padding: 40px;
+          max-width: 1000px;
+          margin: auto;
+        }
+
+        h1 {
+          text-align: center;
+          color: #333;
+        }
+
+        form {
+          background: #fff;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          margin-bottom: 30px;
+        }
+
+        textarea, select, input[type="number"] {
+          width: 100%;
+          margin-top: 10px;
+          margin-bottom: 20px;
+          padding: 10px;
+          font-size: 1em;
+          border-radius: 6px;
+          border: 1px solid #ccc;
+        }
+
+        button {
+          padding: 10px 20px;
+          background-color: #007bff;
+          border: none;
+          border-radius: 6px;
+          color: white;
+          font-weight: bold;
+          cursor: pointer;
+        }
+
+        button:hover {
+          background-color: #0056b3;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          background: #fff;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+          padding: 12px 15px;
+          border-bottom: 1px solid #eee;
+          text-align: left;
+        }
+
+        th {
+          background-color: #f0f0f0;
+          font-weight: 600;
+        }
+
+        td button {
+          background-color: #6c757d;
+          margin-right: 5px;
+        }
+
+        td button:hover {
+          background-color: #5a6268;
+        }
     </style>
 </head>
-<body>
-    <h1>Prompt Tracker Lite</h1>
-    <form id="promptForm">
-        <label>Prompt:</label><br>
-        <textarea id="promptText"></textarea><br>
+<body onload="fetchLogs()">
+<h1>Prompt Tracker Lite</h1>
+<form id="promptForm">
+    <label>Prompt:</label>
+    <textarea id="promptText" placeholder="Enter your prompt here..."></textarea>
+
+    <label>Model:</label>
+    <select id="modelSelect">
+        <option value="GPT-4">GPT-4</option>
+        <option value="Claude-2">Claude-2</option>
+        <option value="Mistral">Mistral</option>
+    </select>
+
+    <label>Temperature:</label>
+    <input type="number" id="temperature" value="0.7" step="0.1" min="0" max="1">
+
+    <button type="submit">💾 Save Prompt</button>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Prompt</th>
+        <th>Model</th>
+        <th>Temp</th>
+        <th>Time Ago</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="promptLog"></tbody>
+</table>
+
+
+<!-- Edit Modal -->
+<div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4);">
+    <div style="background:#fff; max-width:500px; margin:100px auto; padding:20px; border-radius:8px; position:relative;">
+        <h3>Edit Prompt</h3>
+        <input type="hidden" id="editId">
+        <label>Prompt:</label>
+        <textarea id="editPromptText" style="width:100%; height:80px;"></textarea>
+
         <label>Model:</label>
-        <select id="modelSelect">
+        <select id="editModelSelect" style="width:100%;">
             <option value="GPT-4">GPT-4</option>
             <option value="Claude-2">Claude-2</option>
             <option value="Mistral">Mistral</option>
         </select>
+
         <label>Temperature:</label>
-        <input type="number" id="temperature" value="0.7" step="0.1" min="0" max="1"><br>
-        <button type="submit">Save Prompt</button>
-    </form>
-    <table>
-        <thead>
-            <tr><th>ID</th><th>Prompt</th><th>Model</th><th>Temp</th><th>Timestamp</th></tr>
-        </thead>
-        <tbody id="promptLog"></tbody>
-    </table>
-    <script src="/static/script.js"></script>
+        <input type="number" id="editTemperature" style="width:100%;" step="0.1" min="0" max="1">
+
+        <div style="margin-top:20px; text-align:right;">
+            <button onclick="closeModal()">Cancel</button>
+            <button onclick="submitEdit()" style="background:#28a745;">Save</button>
+        </div>
+    </div>
+</div>
+
+<script src="/static/script.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/dayjs/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs/plugin/relativeTime.js"></script>
+<script>
+    dayjs.extend(dayjs_plugin_relativeTime);
+
+    function timeAgo(isoString) {
+        return dayjs(isoString).fromNow();
+    }
+</script>
 </body>
 </html>
